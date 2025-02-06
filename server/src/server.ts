@@ -1,5 +1,5 @@
 const express = require("express");
-const { Server } = require("socket.io");
+const { Server, Socket } = require("socket.io");
 const http = require("http");
 const cors = require("cors");
 
@@ -15,21 +15,32 @@ const io = new Server(server, {
   },
 });
 
+// Define message structure
+interface MessageData {
+  room: string;
+  message: string;
+}
+
 io.on("connection", (socket: any) => {
   console.log("User connected:", socket.id);
 
-  socket.on("oneToOneMessage", (message: object) => {
-    console.log("Message received:", message);
-    socket.broadcast.emit("reciveMessage", message);
+  socket.on("oneToOneMessage", (data: MessageData) => {
+    if (data?.room && data?.message) {
+      console.log(`Message received in room ${data.room}:`, data.message);
+      socket.to(data.room).emit("reciveMessage", data.message);
+    }
   });
 
-  socket.on("join_room", (roomNumber: string) => {
-    socket.join(roomNumber);
+  socket.on("join_room", (room: string) => {
+    if (room) {
+      console.log(`User ${socket.id} joined room: ${room}`);
+      socket.join(room);
+    }
   });
 
-  // socket.on("disconnect", () => {
-  //   console.log("User disconnected:", socket.id);
-  // });
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
 });
 
 server.listen(3001, () => {
