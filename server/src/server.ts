@@ -22,8 +22,6 @@ interface MessageData {
 }
 
 io.on("connection", (socket: any) => {
-  console.log("User connected:", socket.id);
-
   socket.on("oneToOneMessage", (data: MessageData) => {
     if (data?.room && data?.message) {
       console.log(`Message received in room ${data.room}:`, data.message);
@@ -33,14 +31,11 @@ io.on("connection", (socket: any) => {
 
   socket.on("join_room", (room: string) => {
     if (room) {
-      console.log(`User ${socket.id} joined room: ${room}`);
       socket.join(room);
     }
   });
 
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-  });
+  socket.on("disconnect", () => {});
 });
 
 server.listen(3001, () => {

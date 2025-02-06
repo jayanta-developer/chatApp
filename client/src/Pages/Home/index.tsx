@@ -24,12 +24,10 @@ export default function Home() {
 
   useEffect(() => {
     const handleMessageReceive = (data: string) => {
-      console.log("Received:", data);
       setReciveMessage((prevMessages) => [...prevMessages, data]);
     };
 
     socket.on("reciveMessage", handleMessageReceive);
-
     return () => {
       socket.off("reciveMessage", handleMessageReceive);
     };
